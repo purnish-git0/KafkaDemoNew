@@ -9,5 +9,3 @@
 .\bin\windows\kafka-console-consumer.bat --topic message-from-user-event --from-beginning --bootstrap-server localhost:9092
 
 .\bin\windows\kafka-console-producer.bat --topic cab-reservation --bootstrap-server localhost:9092
-
-.\bin\windows\kafka-console-producer.bat --topic cab-reservation --bootstrap-server localhost:9092
