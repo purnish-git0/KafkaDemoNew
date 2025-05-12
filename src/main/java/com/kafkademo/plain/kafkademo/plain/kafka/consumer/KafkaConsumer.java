@@ -25,4 +25,10 @@ public class KafkaConsumer {
     public void listenMessageFromUser(ConsumerRecord<?, ?> consumerRecord) {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
     }
+
+    @KafkaListener(topics = "cab-reservation", groupId = "cab-booking-group", containerFactory = "kafkaListenerContainerFactory")
+    public void listenMessageFromCabUser(ConsumerRecord<?, ?> consumerRecord) {
+        LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
+    }
+
 }
