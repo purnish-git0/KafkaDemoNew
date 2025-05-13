@@ -16,8 +16,8 @@ public class BookingProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     public void publishToTopic(String message) {
-        String topicName = "booking-payment-events";
-        CompletableFuture<SendResult<String, String>> newFuture = kafkaTemplate.send("message-from-user-event", message);
+        String topicName = "message-from-user-event";
+        CompletableFuture<SendResult<String, String>> newFuture = kafkaTemplate.send(topicName, message);
         newFuture.whenComplete((result, ex) -> {
                     if (ex == null) {
                         System.out.println(result.toString());
