@@ -1,9 +1,14 @@
 package com.kafkademo.plain.kafkademo.plain.config;
 
+import com.kafkademo.plain.kafkademo.plain.kafka.EventBooking;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.kafka.streams.StreamsConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
+import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -11,6 +16,9 @@ import org.springframework.kafka.core.ProducerFactory;
 import java.beans.BeanProperty;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
+import static org.apache.kafka.streams.StreamsConfig.*;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -66,5 +74,27 @@ public class KafkaProducerConfig {
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 StringSerializer.class);
         return configProps;
+    }
+
+    @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
+    KafkaStreamsConfiguration kStreamsConfig() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(APPLICATION_ID_CONFIG, "streams-app");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
+        props.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
+
+        return new KafkaStreamsConfiguration(props);
+    }
+
+    @Bean(name = "bookingStreamConfig")
+    KafkaStreamsConfiguration eventBookingKStreamsConfig() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(APPLICATION_ID_CONFIG, "streams-app");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
+        props.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.serdeFrom(EventBooking.class).getClass().getName());
+
+        return new KafkaStreamsConfiguration(props);
     }
 }
