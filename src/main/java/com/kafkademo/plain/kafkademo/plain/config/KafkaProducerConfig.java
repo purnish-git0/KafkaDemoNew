@@ -21,6 +21,32 @@ public class KafkaProducerConfig {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
+    @Bean
+    public ProducerFactory<?, ?> genericProducerFactory() {
+        Map<String, Object> configProps = getConfigMap();
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public ProducerFactory<String, String> customPartitionProducerFactory() {
+        Map<String, Object> configProps = getConfigMap();
+        configProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, CustomPartitioner.class.getName());
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, String> customPartitionKafkaTemplate() {
+
+        return new KafkaTemplate<>(customPartitionProducerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<?, ?> genericKafkaTemplate() {
+
+        return new KafkaTemplate<>(genericProducerFactory());
+    }
+
+
 
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate() {
