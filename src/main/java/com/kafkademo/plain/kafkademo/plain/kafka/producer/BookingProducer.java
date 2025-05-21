@@ -3,6 +3,11 @@ package com.kafkademo.plain.kafkademo.plain.kafka.producer;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StoreQueryParameters;
+import org.apache.kafka.streams.state.QueryableStoreTypes;
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -17,10 +22,11 @@ public class BookingProducer {
 
     private final KafkaTemplate<?, ?> genericKafkaTemplate;
 
+
     public void pushToStreamingTopic(String topic) {
 
         String topicName = "demo-topic-1";
-        CompletableFuture<SendResult<String, String>> streamingFuture = kafkaTemplate.send(topicName, "pushing-to-streaming-topic");
+        CompletableFuture<SendResult<String, String>> streamingFuture = kafkaTemplate.send(topicName, "demo-key-1", "pushing-to-streaming-topic");
         streamingFuture.whenComplete((result, ex) -> {
                     if (ex == null) {
                         System.out.println(result.toString());
@@ -30,6 +36,14 @@ public class BookingProducer {
                 }
         );
 
+    }
+
+    public void getFromTable() {
+//        ReadOnlyKeyValueStore<String, Long> demoStore = kafkaStreams.store(
+//                StoreQueryParameters.fromNameAndType("demo-1", QueryableStoreTypes.keyValueStore())
+//        );
+//
+//        demoStore.get("demo-1");
     }
 
     public void publishToTopic(String message) {

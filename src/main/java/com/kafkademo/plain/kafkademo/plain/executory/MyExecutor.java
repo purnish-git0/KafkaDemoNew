@@ -17,13 +17,13 @@ public class MyExecutor {
 
     private final CustomPartitionProducer customPartitionProducer;
 
-    @Autowired
-    private StreamsBuilderFactoryBean factoryBean;
+
 
     public void startStreamProcessing() {
 //        KafkaStreams kafkaStreams = factoryBean.getKafkaStreams();
 //        kafkaStreams.start();
         producer.pushToStreamingTopic("example");
+        producer.getFromTable();
 
     }
 
