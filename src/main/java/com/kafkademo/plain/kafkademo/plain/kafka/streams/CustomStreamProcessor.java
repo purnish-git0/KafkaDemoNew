@@ -13,40 +13,24 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static java.lang.ProcessBuilder.Redirect.to;
+
 @Component
 public class CustomStreamProcessor {
 
     private static final Serde<String> STRING_SERDE = Serdes.String();
 
-    private static final Serde<EventBooking> EVENT_BOOKING_SERDE = new JsonSerde<>(EventBooking.class);
-
-    private static final Serde<BookableEvent> BOOKABLE_EVENT_SERDE = new JsonSerde<>(BookableEvent.class);
-
     @Autowired
-    void buildPipeline(StreamsBuilder streamsBuilder) {
-        KStream<String, String> customTopic2Stream = streamsBuilder
-                .stream("custom-topic-2", Consumed.with(STRING_SERDE, STRING_SERDE));
+    void process(StreamsBuilder kStreamBuilder) {
 
-        KTable<String, String> kTableTopic2 = customTopic2Stream.toTable();
+        KStream<String, String> exampleStream = kStreamBuilder.stream("demo-topic-1", Consumed.with(STRING_SERDE, STRING_SERDE));
 
-        KStream<String, BookableEvent> bookableEventKStream = streamsBuilder
-                .stream("bookable-event-topic-2", Consumed.with(STRING_SERDE, BOOKABLE_EVENT_SERDE));
-
-        KTable<String, BookableEvent> kTableBookableEvent = bookableEventKStream.toTable();
+        exampleStream.mapValues((key,value) -> {
+            return value+"_mapped";
+        }).to("demo-topic-2");
 
 
-
-        KStream<String, EventBooking> bookingStream = streamsBuilder
-                .stream("event-booking-topic-3", Consumed.with(STRING_SERDE, EVENT_BOOKING_SERDE));
-//
-//        KeyValueMapper<EventBooking, BookableEvent, BookingEventInfo> foreignKeyExtractor =
-//                (eventBooking, bookableEvent) -> eventBooking.get("id").toString();
-//
-//
-//
-//        KStream<String, BookingEventInfo> bookingEventInfoKStream
-//                = bookableEventKStream.leftJoin()
-
+        
 
     }
 }

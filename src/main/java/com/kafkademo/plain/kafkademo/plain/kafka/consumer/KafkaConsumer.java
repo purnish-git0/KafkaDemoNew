@@ -27,6 +27,11 @@ public class KafkaConsumer {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
     }
 
+    @KafkaListener(topics = "demo-topic-2", groupId = "demo-group", containerFactory = "kafkaListenerContainerFactory")
+    public void listenToDemoTopic2(ConsumerRecord<?, ?> consumerRecord) {
+        LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
+    }
+
     @KafkaListener(topics = "cab-reservation", groupId = "cab-booking-group", containerFactory = "kafkaListenerContainerFactory")
     public void listenMessageFromCabUser(ConsumerRecord<?, ?> consumerRecord) {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
@@ -60,5 +65,10 @@ public class KafkaConsumer {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
     }
 
-    
+//    process-result-topic
+
+    @KafkaListener(topics = "process-result-topic", groupId = "example-streaming-group", containerFactory = "kafkaListenerContainerFactory")
+    public void listenToStreamOutput(ConsumerRecord<?, ?> consumerRecord) {
+        LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
+    }
 }

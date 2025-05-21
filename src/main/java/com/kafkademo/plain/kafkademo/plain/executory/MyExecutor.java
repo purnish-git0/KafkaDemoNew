@@ -4,6 +4,9 @@ import com.kafkademo.plain.kafkademo.plain.kafka.producer.BookingProducer;
 import com.kafkademo.plain.kafkademo.plain.kafka.producer.CustomPartitionProducer;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.streams.KafkaStreams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +17,15 @@ public class MyExecutor {
 
     private final CustomPartitionProducer customPartitionProducer;
 
+    @Autowired
+    private StreamsBuilderFactoryBean factoryBean;
+
+    public void startStreamProcessing() {
+//        KafkaStreams kafkaStreams = factoryBean.getKafkaStreams();
+//        kafkaStreams.start();
+        producer.pushToStreamingTopic("example");
+
+    }
 
     public void startOps() {
         int ctr=0;
