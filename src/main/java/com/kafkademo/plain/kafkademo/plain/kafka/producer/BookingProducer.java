@@ -5,20 +5,36 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StoreQueryParameters;
+import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.state.QueryableStoreTypes;
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+
+import static org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_BUILDER_BEAN_NAME;
 
 @Component
 @AllArgsConstructor
 public class BookingProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
+
+
+    @Qualifier("primaryStreamsBuilder")
+    public FactoryBean<StreamsBuilder> streamsBuilder;
+
+    @Qualifier("primaryStreamsConfig")
+    public KafkaStreamsConfiguration kafkaStreamsConfiguration;
 
     private final KafkaTemplate<?, ?> genericKafkaTemplate;
 
@@ -39,11 +55,13 @@ public class BookingProducer {
     }
 
     public void getFromTable() {
-//        ReadOnlyKeyValueStore<String, Long> demoStore = kafkaStreams.store(
-//                StoreQueryParameters.fromNameAndType("demo-1", QueryableStoreTypes.keyValueStore())
-//        );
-//
-//        demoStore.get("demo-1");
+
+        KafkaStreams kafkaStreams =new KafkaStreams(Objects.requireNonNull(((StreamsBuilderFactoryBean) streamsBuilder).getTopology()), kafkaStreamsConfiguration.asProperties());
+        ReadOnlyKeyValueStore<String, Long> demoStore = kafkaStreams.store(
+                StoreQueryParameters.fromNameAndType("demo-store-1", QueryableStoreTypes.keyValueStore())
+        );
+
+        demoStore.get("demo-1");
     }
 
     public void publishToTopic(String message) {

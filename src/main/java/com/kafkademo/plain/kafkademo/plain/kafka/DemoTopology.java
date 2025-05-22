@@ -9,6 +9,7 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
+import org.apache.kafka.streams.state.*;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,33 +33,48 @@ public class DemoTopology {
 
     private static final Serde<String> STRING_SERDE = Serdes.String();
 
+    @Bean
+    @Qualifier("primaryStreamsBuilder")
+    public FactoryBean<StreamsBuilder> demoKStreamsBuilder(@Qualifier("primaryStreamsConfig") KafkaStreamsConfiguration streamsConfig) {
+        StreamsBuilderFactoryBean streamsBuilderFactoryBean = new StreamsBuilderFactoryBean(streamsConfig);
+        streamsBuilderFactoryBean.setSingleton(Boolean.TRUE);
+        return streamsBuilderFactoryBean;
+    }
 
-    @Bean(name = DEFAULT_STREAMS_BUILDER_BEAN_NAME )
-    public FactoryBean<StreamsBuilder> streamsBuilderFactoryBean2() {
+    @Bean(name = "primaryStreamsConfig")
+    public KafkaStreamsConfiguration streamsConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-app-2");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        props.put(StreamsConfig.STATE_DIR_CONFIG, String.format("%s%s", "streams-app-2", "9092"));
+
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         KafkaStreamsConfiguration streamsConfig = new KafkaStreamsConfiguration(props);
-        StreamsBuilderFactoryBean streamsBuilder = new StreamsBuilderFactoryBean(streamsConfig);
-        streamsBuilder.setSingleton(Boolean.TRUE);
-
-
-
-        return streamsBuilder;
+        return streamsConfig;
     }
 
+
+
     @Bean
-    public KStream<String, String> demoKStream(@Autowired StreamsBuilder streamsBuilderNew) {
-        KStream<String, String> kstream = streamsBuilderNew.stream("demo-topic-1");
+    public KStream<String, String> demoKStream(@Qualifier("primaryStreamsBuilder") StreamsBuilder demoKStreamsBuilder) {
+        KStream<String, String> kstream = demoKStreamsBuilder.stream("demo-topic-1");
         kstream.to("demo-topic-2");
         kstream.foreach((key, value) -> {});
         return kstream;
 
     }
 
+    @Bean
+    public KTable<String, String> demoKTable(@Qualifier("primaryStreamsBuilder") StreamsBuilder demoKStreamsBuilder) {
 
+        StoreBuilder demoStateStore = Stores.keyValueStoreBuilder(Stores.persistentKeyValueStore("demo-store-1"),STRING_SERDE, STRING_SERDE)
+                .withLoggingEnabled(new HashMap<>());
+        demoKStreamsBuilder.stream("demo-topic-1", Consumed.with(Serdes.String(), STRING_SERDE)).to("demo-output-topic",Produced.with(Serdes.String(), STRING_SERDE));
+        KTable<String, String> demoTable = demoKStreamsBuilder.table("demo-table-1", Consumed.with(Serdes.String(), STRING_SERDE),Materialized.as(demoStateStore.name()));
+
+        return demoTable;
+    }
 
 
 
