@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_BUILDER_BEAN_NAME;
 
@@ -30,8 +31,8 @@ public class BookingProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
 
 
-    @Qualifier("primaryStreamsBuilder")
-    public FactoryBean<StreamsBuilder> streamsBuilder;
+    @Autowired
+    private StreamsBuilderFactoryBean factoryBean;
 
     @Qualifier("primaryStreamsConfig")
     public KafkaStreamsConfiguration kafkaStreamsConfiguration;
@@ -54,9 +55,13 @@ public class BookingProducer {
 
     }
 
+    public void getFromTable2() {
+
+    }
+
     public void getFromTable() {
 
-        KafkaStreams kafkaStreams =new KafkaStreams(Objects.requireNonNull(((StreamsBuilderFactoryBean) streamsBuilder).getTopology()), kafkaStreamsConfiguration.asProperties());
+        KafkaStreams kafkaStreams = factoryBean.getKafkaStreams();
         ReadOnlyKeyValueStore<String, Long> demoStore = kafkaStreams.store(
                 StoreQueryParameters.fromNameAndType("demo-store-1", QueryableStoreTypes.keyValueStore())
         );

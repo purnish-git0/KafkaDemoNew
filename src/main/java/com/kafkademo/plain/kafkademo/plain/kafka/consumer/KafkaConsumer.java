@@ -27,7 +27,7 @@ public class KafkaConsumer {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
     }
 
-    @KafkaListener(topics = "demo-topic-2", groupId = "demo-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "demo-topic-1, demo-output-topic", groupId = "demo-group", containerFactory = "kafkaListenerContainerFactory")
     public void listenToDemoTopic2(ConsumerRecord<?, ?> consumerRecord) {
         LOG.info(consumerRecord.topic() + " " + consumerRecord.partition());
     }

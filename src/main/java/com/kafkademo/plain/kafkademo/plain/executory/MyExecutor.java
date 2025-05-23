@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @AllArgsConstructor
 public class MyExecutor {
@@ -17,13 +19,15 @@ public class MyExecutor {
 
     private final CustomPartitionProducer customPartitionProducer;
 
+    private final StreamsBuilderFactoryBean factoryBean;
 
 
     public void startStreamProcessing() {
 //        KafkaStreams kafkaStreams = factoryBean.getKafkaStreams();
 //        kafkaStreams.start();
+//        Objects.requireNonNull(factoryBean.getKafkaStreams()).start();
         producer.pushToStreamingTopic("example");
-        producer.getFromTable();
+//        producer.getFromTable();
 
     }
 
