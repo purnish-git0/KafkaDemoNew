@@ -1,29 +1,20 @@
 package com.kafkademo.plain.kafkademo.plain.kafka;
 
-import com.kafkademo.plain.kafkademo.plain.config.KafkaStreamsConfig;
 import lombok.AllArgsConstructor;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.*;
 import org.apache.kafka.streams.state.*;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.config.StreamsBuilderFactoryBean;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-
-import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
-import static org.apache.kafka.streams.StreamsConfig.*;
-import static org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_BUILDER_BEAN_NAME;
 
 @Component
 @AllArgsConstructor
@@ -88,29 +79,5 @@ public class DemoTopology {
 
         return demoTable;
     }
-
-    @Bean
-    public KafkaStreams.StateListener kafkaStreamsStateListener(StreamsBuilderFactoryBean streamsBuilderFactoryBean) {
-        return (newState, oldState) -> {
-
-
-            if(newState == KafkaStreams.State.RUNNING) {
-                KafkaStreams kafkaStreams = streamsBuilderFactoryBean.getKafkaStreams();
-                ReadOnlyKeyValueStore<String, Long> demoStore = kafkaStreams.store(
-                        StoreQueryParameters.fromNameAndType("demo-store-1", QueryableStoreTypes.keyValueStore())
-                );
-
-                demoStore.get("demo-1");
-            }
-        };
-    }
-
-
-
-
-
-
-
-
 
 }
