@@ -40,6 +40,11 @@ public class BookingProducer {
     private final KafkaTemplate<?, ?> genericKafkaTemplate;
 
 
+
+    public void createBooking() {
+
+    }
+
     public void pushToStreamingTopic(String topic) {
 
         String topicName = "demo-topic-1";

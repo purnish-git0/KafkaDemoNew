@@ -23,11 +23,7 @@ public class MyExecutor {
 
 
     public void startStreamProcessing() {
-//        KafkaStreams kafkaStreams = factoryBean.getKafkaStreams();
-//        kafkaStreams.start();
-//        Objects.requireNonNull(factoryBean.getKafkaStreams()).start();
         producer.pushToStreamingTopic("example");
-//        producer.getFromTable();
 
     }
 
